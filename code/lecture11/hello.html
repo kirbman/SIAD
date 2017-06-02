@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>It's ya Boi, FIRE here to save the day</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<body>
+
+<body>
+<div class="container-fluid">
+<h1> Cody Kirby </h1>
+<p> We're all just a kid from somewhere </p>
+<img src="selfie.jpg" width="320" height="400"/>
+</div>
+<form action="/cgi-bin/hello.cgi">
+Your name: <input name="name" size="20">
+<input type="submit" value="Submit!">
+</form>
+<div id="mydiv" onclick="document.getElementById('mydiv').innerHTML = Date()">Show Date()</div>
+<p>
+<a href="http://www.reddit.com/r/StarWars"> Unlimited Knowledge </a> 
+<script src="alert.js"></script>
+<script> function startTime() {
+	document.getElementById('clock').innerHTML = new Date();
+	setTimeout(startTime, 500);
+}
+</script>
+<body onload="startTime()">
+<div id="clock"></div>
+
+<div id="email" onclick="showhide()">show my email</div>
+<script>
+var shown = false;
+function showhide() {
+	if(shown) {
+		document.getElementById('email').innerHTML = "show my email";
+		shown = false;
+	} else {
+		var myemail = "<a href='mailto:ckirby1" + "@" + "udayton.edu'>ckirby1" + "@" + "udayton.edu</a>";
+		//alert("myemail="+myemail);
+		document.getElementById('email').innerHTML = myemail;
+		shown = true;
+	}
+}
+</script>
+</p>
+</body>
