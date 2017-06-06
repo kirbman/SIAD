@@ -3,9 +3,12 @@
 import java.net.Socket;
 import java.io.*;
 import java.net.ServerSocket;
+import java.util.ArrayList;
 
-public class mytcpserver {
+public class chatserver {
+	private List<TCPServerThread> userList = new ArrayList<TCPServerThread>();
 	public static void main(String[] args) throws IOException {
+		
 		//create server socket
 		int portNum = 2552;
 		ServerSocket serverSocket = new ServerSocket(portNum);
@@ -38,7 +41,15 @@ class TCPServerThread extends Thread {
 			while(true){
 				inputLine  = in.readLine();
 				if(!inputLine.isEmpty()){
-					System.out.println("Received Data from Client:\n" + inputLine);
+					if(inputLine.equals("exit")) {
+						System.out.println("User wants to exit");
+						
+					} else if (inputLine.equals("list")) {
+						System.out.println("User wants the list of users");
+						clientSocket.getOutputStream().write(userList.getBytes("UTF-8"));
+					} else {
+						System.out.println("Received Data from Client: " + inputLine);
+					}
 				}
 		
 				//send data back to client
@@ -46,6 +57,7 @@ class TCPServerThread extends Thread {
 				clientSocket.getOutputStream().write(response.getBytes("UTF-8"));
 				//clientSocket.close();
 			}
+			
 		} catch(IOException e) { }
 	}
 }

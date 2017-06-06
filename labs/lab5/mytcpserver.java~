@@ -42,7 +42,7 @@ class TCPServerThread extends Thread {
 				}
 		
 				//send data back to client
-				String response = inputLine + "\n";		
+				String response = "Message: " + inputLine + "\n";		
 				clientSocket.getOutputStream().write(response.getBytes("UTF-8"));
 				//clientSocket.close();
 			}

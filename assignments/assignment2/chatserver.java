@@ -1,68 +1,63 @@
-/*
- * Copyright (c) 2013, Oracle and/or its affiliates. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- *   - Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *
- *   - Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *
- *   - Neither the name of Oracle or the names of its
- *     contributors may be used to endorse or promote products derived
- *     from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
- * IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
- * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
- * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
- * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */ 
+/*chatserver in java*/
 
-import java.net.*;
+import java.net.Socket;
 import java.io.*;
+import java.net.ServerSocket;
+import java.util.ArrayList;
 
 public class chatserver {
-    public static void main(String[] args) throws IOException {
-        
-        if (args.length != 1) {
-            System.err.println("Usage: java EchoServer <port number>");
-            System.exit(1);
-        }
-        
-        int portNumber = Integer.parseInt(args[0]);
-        
-        try {
-            ServerSocket serverSocket =
-                new ServerSocket(Integer.parseInt(args[0]));
-            System.out.println("EchoServer is running at port " + Integer.parseInt(args[0]));
-            Socket clientSocket = serverSocket.accept(); 
-            System.out.println("A client is connected ");    
-            PrintWriter out =
-                new PrintWriter(clientSocket.getOutputStream(), true);                   
-            BufferedReader in = new BufferedReader(
-                new InputStreamReader(clientSocket.getInputStream()));
-    
-            String inputLine;
-            while ((inputLine = in.readLine()) != null) {
-                System.out.println("received from client: " + inputLine);
-                System.out.println("Echo back");
-                out.println(inputLine);
-            }
-        } catch (IOException e) {
-            System.out.println("Exception caught when trying to listen on port "
-                + portNumber + " or listening for a connection");
-            System.out.println(e.getMessage());
-        }
-    }
+	private List<TCPServerThread> userList = new ArrayList<TCPServerThread>();
+	public static void main(String[] args) throws IOException {
+		
+		//create server socket
+		int portNum = 2552;
+		ServerSocket serverSocket = new ServerSocket(portNum);
+		//confirm port is running on the correct port
+		System.out.println("Server is running on port " + serverSocket.getLocalPort());
+		
+		//accept client
+		while(true){
+			Socket clientSocket = serverSocket.accept();
+			new TCPServerThread(clientSocket).start();
+			System.out.println("Connection established with IP: " + clientSocket.getInetAddress().getHostAddress());		
+		}
+	}
+}
+
+class TCPServerThread extends Thread {
+	private Socket clientSocket = null;
+	
+	TCPServerThread(Socket clientSocket) {
+		super("TCPServerThread");
+		this.clientSocket = clientSocket;
+	}
+	
+	public void run() {
+		try{	
+		//receive data from client
+			BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+			String inputLine; 
+			//String receivedData = inputLine;
+			while(true){
+				inputLine  = in.readLine();
+				if(!inputLine.isEmpty()){
+					if(inputLine.equals("exit")) {
+						System.out.println("User wants to exit");
+						
+					} else if (inputLine.equals("list")) {
+						System.out.println("User wants the list of users");
+						clientSocket.getOutputStream().write(userList.getBytes("UTF-8"));
+					} else {
+						System.out.println("Received Data from Client: " + inputLine);
+					}
+				}
+		
+				//send data back to client
+				String response = inputLine + "\n";		
+				clientSocket.getOutputStream().write(response.getBytes("UTF-8"));
+				//clientSocket.close();
+			}
+			
+		} catch(IOException e) { }
+	}
 }

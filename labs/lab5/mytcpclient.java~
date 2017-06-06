@@ -4,7 +4,7 @@
 import java.net.Socket;
 import java.io.*;
 
-public class chatclient {
+public class mytcpclient {
 	public static void main(String[] args) throws IOException {
 		//check arguments
 		if(args.length != 2){
@@ -15,7 +15,7 @@ public class chatclient {
 		//Get server IP ect
 		String hostName = args[0];
 		int portNum = Integer.parseInt(args[1]);
-
+	 try {
 		//create client socket
 		Socket sock = new Socket(hostName, portNum);
 		System.out.println("Connection Established\nHost: " + hostName + " Port: " + portNum + "\n");
@@ -29,10 +29,10 @@ public class chatclient {
 
 		String userInput;
 		while ((userInput = stdln.readLine()) != null) {
-			if (userInput.equals("exit")) {
+			if (userInput.equals("Exit")) {
 				System.out.println("Closing socket...\nClosing program...\n");
-				sock.close();
 				System.exit(1);
+				sock.close();
 			}
 			out.println(userInput);
 		}	

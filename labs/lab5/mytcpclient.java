@@ -15,7 +15,7 @@ public class mytcpclient {
 		//Get server IP ect
 		String hostName = args[0];
 		int portNum = Integer.parseInt(args[1]);
-	 
+
 		//create client socket
 		Socket sock = new Socket(hostName, portNum);
 		System.out.println("Connection Established\nHost: " + hostName + " Port: " + portNum + "\n");
