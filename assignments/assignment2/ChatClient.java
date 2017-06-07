@@ -4,7 +4,7 @@
 import java.net.Socket;
 import java.io.*;
 
-public class chatclient {
+public class ChatClient {
 	public static void main(String[] args) throws IOException {
 		//check arguments
 		if(args.length != 2){
@@ -19,6 +19,7 @@ public class chatclient {
 		//create client socket
 		Socket sock = new Socket(hostName, portNum);
 		System.out.println("Connection Established\nHost: " + hostName + " Port: " + portNum + "\n");
+		System.out.println("********************************\n*           Chat Menu          *\n********************************\n* exit - Leave the chat server *\n* list - Display list of users *\n********************************\n");
 
 		//output stream to send data
 		PrintWriter out = new PrintWriter(sock.getOutputStream(), true);			
@@ -29,10 +30,10 @@ public class chatclient {
 
 		String userInput;
 		while ((userInput = stdln.readLine()) != null) {
-			if (userInput.equals("exit")) {
+			if (userInput.equals("exit")) {		
 				System.out.println("Closing socket...\nClosing program...\n");
 				sock.close();
-				System.exit(1);
+				System.exit(1);	
 			}
 			out.println(userInput);
 		}	
