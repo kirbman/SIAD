@@ -1,4 +1,4 @@
-/*mytcpclient in java*/
+/*ChatClient in java*/
 
 
 import java.net.Socket;
@@ -19,7 +19,9 @@ public class ChatClient {
 		//create client socket
 		Socket sock = new Socket(hostName, portNum);
 		System.out.println("Connection Established\nHost: " + hostName + " Port: " + portNum + "\n");
-		System.out.println("********************************\n*           Chat Menu          *\n********************************\n* exit - Leave the chat server *\n* list - Display list of users *\n********************************\n");
+		System.out.println("********************************\n*           Chat Menu          *\n******"
+			+ "**************************\n* exit - Leave the chat server *\n* list - Display list of " 
+			+ "users *\n********************************\n");
 
 		//output stream to send data
 		PrintWriter out = new PrintWriter(sock.getOutputStream(), true);			
@@ -30,14 +32,14 @@ public class ChatClient {
 
 		String userInput;
 		while ((userInput = stdln.readLine()) != null) {
-			if (userInput.equals("exit")) {		
+			if (userInput.equals("exit")) {	
+				out.println(userInput);	
 				System.out.println("Closing socket...\nClosing program...\n");
-				sock.close();
-				System.exit(1);	
+				//sock.close(); throws socket close exception for some reason
+				System.exit(0);
 			}
 			out.println(userInput);
 		}	
-	
 	}
 }
 
@@ -56,7 +58,7 @@ class TCPClientThread extends Thread {
 			while(true){
 				String inputLine = in.readLine();
 				while((inputLine != null) && !inputLine.isEmpty()) {
-					System.out.println("Received from server: " + inputLine);
+					System.out.println(inputLine);
 					inputLine = in.readLine();
 				}
 			}

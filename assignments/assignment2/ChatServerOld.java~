@@ -1,11 +1,10 @@
-/*ChatServer in java*/
+/*chatserver in java*/
 
 import java.net.Socket;
 import java.io.*;
 import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 
 public class ChatServer {
 	public static void main(String[] args) throws IOException {
@@ -30,11 +29,11 @@ class MainServer implements Runnable {
 			//accept client
 			while(true){
 				Socket clientSocket = serverSocket.accept();
-				TCPServerThread thread = new TCPServerThread(this,clientSocket);
-				System.out.println("Adding new user...");
-				threadList.add(thread);
-				System.out.println("User added");
+				TCPServerThread thread = new TCPServerThread(clientSocket);
 				thread.start();
+				//System.out.println("Adding new user...");
+				//userList.add(thread);
+				//System.out.println("User added");
 				System.out.println("Connection established with IP: " + 
 					clientSocket.getInetAddress().getHostAddress());		
 			}
@@ -42,21 +41,25 @@ class MainServer implements Runnable {
 	}
 
 	/***chat methods***/
-
+	//adds thread to list
+	public void join(TCPServerThread thread) {
+		System.out.println("Adding new user...");
+		threadList.add(thread);
+		System.out.println("User added");
+	}
+		
 	//adds user to list
-	public synchronized void  newUser(String user) {
+	public void newUser(String user) {
 		System.out.println("Adding " + user + " to chat list...");
 		userList.add(user);
 		System.out.println(user + " added");
 	}
 	
 	//sends chat message to all users on server
-	public void sendToAll(String user, String msg, int i) throws IOException {
+	public void sendToAll(String user) {
 		System.out.println("Broadcasting message from " + user + "...");
-		Iterator<TCPServerThread> iter = threadList.iterator();
-		while(iter.hasNext()){
-			iter.next().send(user, msg, i);
-		}
+		
+				
 	}
 	
 	//gets a list of all the users currently on the server
@@ -67,18 +70,17 @@ class MainServer implements Runnable {
 	}
 	
 	//drops a user from the server and removes them from the list
-	public synchronized void dropUser(String user, TCPServerThread thread) {
+	public void dropUser(String user, TCPServerThread thread) {
 		System.out.println("Dropping " + user + " from the chat...");
 		threadList.remove(thread);
 		userList.remove(user);
-		System.out.println(user + " successfully dropped from chat.");
+		System.out.println(user + "successfully dropped from chat.");
 	}
 }
 
 class TCPServerThread extends Thread {
-	String username;
 	private Socket clientSocket = null;
-	private MainServer server = null;
+	private MainServer server = new MainServer();
 	TCPServerThread(Socket clientSocket) {
 		super("TCPServerThread");
 		this.clientSocket = clientSocket;
@@ -89,15 +91,16 @@ class TCPServerThread extends Thread {
 		this.server = server;
 		this.clientSocket = clientSocket;
 	}
-	
+
 	public void run() {
 		try{	
+			server.join(this);
 			/***receive data from client***/
 			BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 			
 			//get username
 			System.out.println("Getting username...");
-			
+			String username;
 			String prompt1 = "What is your username?\n";
 			clientSocket.getOutputStream().write(prompt1.getBytes("UTF-8"));
 			username = in.readLine();
@@ -107,8 +110,7 @@ class TCPServerThread extends Thread {
 				username = in.readLine();
 			}
 			server.newUser(username); //add user to chat list
-			server.sendToAll(username, " has joined the chat", 1);
-			String welcome = "Welcome " + username + "! Enter your message below\n";
+			String welcome = "Welcome " + username + "!\n";
 			clientSocket.getOutputStream().write(welcome.getBytes("UTF-8"));
 			
 			//get user chat messages/commands
@@ -119,37 +121,23 @@ class TCPServerThread extends Thread {
 					if(inputLine.equals("exit")) {
 						System.out.println("User wants to exit");
 						server.dropUser(username, this);
-						server.sendToAll(username, " has left the chat", -1);
-						//clientSocket.close();
+						clientSocket.close();
 					} else if (inputLine.equals("list")) {
 						System.out.println("User wants the list of users");
-						String list = server.getUsers() + "\n";
+						String list = server.getUsers();
 						clientSocket.getOutputStream().write(list.getBytes("UTF-8"));
 					} else {
 						System.out.println("Message from " + username + ": " + inputLine);
-						server.sendToAll(username, inputLine, 0);
+						server.sendToAll(username, inputLine);
 					}
 				}
+		
+				//send data back to client
+				//String response = inputLine + "\n";		
+				//clientSocket.getOutputStream().write(response.getBytes("UTF-8"));
+				//clientSocket.close();
 			}
 			
-		} catch(IOException e) { } catch(NullPointerException n) {server.dropUser(username, this);}
-	}
-	
-	//sends message to user
-	public void send(String username, String msg, int i) throws IOException {
-		String finalmsg;
-		//make standard chat message		
-		if(i == 0) {
-			finalmsg = username + ": " + msg + "\n";
-		}
-		//user joined message		
-		else if (i > 0) {
-			finalmsg = username + msg + "\n";
-		} 
-		//user dropped from chat message		
-		else {
-			finalmsg = username + msg + "\n";
-		}
-		clientSocket.getOutputStream().write(finalmsg.getBytes("UTF-8"));
+		} catch(IOException e) { } catch(NullPointerException n) { }
 	}
 }

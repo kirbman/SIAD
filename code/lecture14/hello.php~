@@ -1,0 +1,9 @@
+<?php
+	session_start();
+	echo "Howdy! PHP edition\nYou have visited " . $_SESSION['views'] . " times";
+	if(isset($_SESSION['views'])) {
+		$_SESSION['views'] = $_SESSION['views'] + 1;
+	} else {
+		$_SESSION['views'] = 1;
+	}
+?>

@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 
-public class ChatServer {
+public class TestServer {
 	public static void main(String[] args) throws IOException {
 		MainServer comms = new MainServer();
 		Thread t = new Thread(comms);
@@ -44,7 +44,7 @@ class MainServer implements Runnable {
 	/***chat methods***/
 
 	//adds user to list
-	public synchronized void  newUser(String user) {
+	public void newUser(String user) {
 		System.out.println("Adding " + user + " to chat list...");
 		userList.add(user);
 		System.out.println(user + " added");
@@ -67,7 +67,7 @@ class MainServer implements Runnable {
 	}
 	
 	//drops a user from the server and removes them from the list
-	public synchronized void dropUser(String user, TCPServerThread thread) {
+	public void dropUser(String user, TCPServerThread thread) {
 		System.out.println("Dropping " + user + " from the chat...");
 		threadList.remove(thread);
 		userList.remove(user);
@@ -76,7 +76,6 @@ class MainServer implements Runnable {
 }
 
 class TCPServerThread extends Thread {
-	String username;
 	private Socket clientSocket = null;
 	private MainServer server = null;
 	TCPServerThread(Socket clientSocket) {
@@ -89,7 +88,7 @@ class TCPServerThread extends Thread {
 		this.server = server;
 		this.clientSocket = clientSocket;
 	}
-	
+
 	public void run() {
 		try{	
 			/***receive data from client***/
@@ -97,7 +96,7 @@ class TCPServerThread extends Thread {
 			
 			//get username
 			System.out.println("Getting username...");
-			
+			String username;
 			String prompt1 = "What is your username?\n";
 			clientSocket.getOutputStream().write(prompt1.getBytes("UTF-8"));
 			username = in.readLine();
@@ -132,7 +131,7 @@ class TCPServerThread extends Thread {
 				}
 			}
 			
-		} catch(IOException e) { } catch(NullPointerException n) {server.dropUser(username, this);}
+		} catch(IOException e) { } catch(NullPointerException n) { }
 	}
 	
 	//sends message to user

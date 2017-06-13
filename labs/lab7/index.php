@@ -1,0 +1,34 @@
+<?php
+	session_start();	
+	function checkLogin($username, $password) {
+		if(($username == "kirb") and ($password == "man")){
+			return TRUE;
+		}
+		return FALSE;
+	}
+	echo "Index page<br>\n";
+	//store a login session in $_SESSION["logged"]
+		$username = $_REQUEST["username"];
+		$password = $_REQUEST["password"];
+		//echo "Uncharted territory, ain't it mate?<br>";
+		//echo "<debugin'> Username = $username Password = $password<br>";
+	if(isset($username) and isset($password)) {		
+		if(checkLogin($username, $password)){
+			echo "Valid username and password <br>";
+			$_SESSION["logged"] = TRUE;
+		} else {
+			header("refresh:1; url = login.php");
+			echo "Incorrect username or password <br>";
+			session_destroy();	
+		}
+	}
+
+	if(isset($_SESSION["logged"])) {
+		echo "Welcome Back Bro Beans!<br>";
+		echo "<a href='logout.php'>Click here to logout</a>";
+	} else {
+		header("refresh:1; url = login.php");
+		echo "You have not logged in before<br>";
+		session_destroy();
+	}
+?>
